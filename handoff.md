@@ -12,7 +12,7 @@ Build a Q&A chatbot step by step using LangChain and OpenAI.
 - [x] **Step 4: Memory** — manual message history list in `step2_basic_call.py`
 
 ### Up Next
-- [ ] **Step 5: CLI chat loop** — interactive terminal chatbot
+- [x] **Step 5: CLI chat loop** — interactive terminal chatbot in `step2_basic_call.py`
 
 ## Environment Notes
 - Python venv at `venv/` (not committed)
@@ -25,4 +25,4 @@ Build a Q&A chatbot step by step using LangChain and OpenAI.
 
 ## How to Resume
 1. Activate venv: `venv\Scripts\activate`
-2. Continue from Step 5: CLI chat loop
+2. All 5 steps complete — chatbot is fully working

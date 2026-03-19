@@ -10,28 +10,24 @@ llm = ChatOpenAI(
     http_client=httpx.Client(verify=False)
 )
 
-# Memory is just a list of messages — the full conversation history
 history = [
-    SystemMessage(content="You are a helpful assistant that answers questions about space exploration. Keep answers concise.")
+    SystemMessage(content="You are a helpful assistant. Keep answers concise.")
 ]
 
-# Turn 1
-history.append(HumanMessage(content="What was the first animal in space?"))
-response = llm.invoke(history)
-history.append(AIMessage(content=response.content))  # save the response to history
-print(f"User:      What was the first animal in space?")
-print(f"Assistant: {response.content}\n")
+print("Chatbot ready. Type 'quit' to exit.\n")
 
-# Turn 2 — the LLM can refer back to turn 1
-history.append(HumanMessage(content="How long did it survive?"))
-response = llm.invoke(history)
-history.append(AIMessage(content=response.content))
-print(f"User:      How long did it survive?")
-print(f"Assistant: {response.content}\n")
+while True:
+    user_input = input("You: ").strip()
 
-# Turn 3
-history.append(HumanMessage(content="What country sent it?"))
-response = llm.invoke(history)
-history.append(AIMessage(content=response.content))
-print(f"User:      What country sent it?")
-print(f"Assistant: {response.content}\n")
+    if user_input.lower() == "quit":
+        print("Goodbye!")
+        break
+
+    if not user_input:
+        continue
+
+    history.append(HumanMessage(content=user_input))
+    response = llm.invoke(history)
+    history.append(AIMessage(content=response.content))
+
+    print(f"Bot: {response.content}\n")
