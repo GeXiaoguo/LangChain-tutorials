@@ -19,9 +19,20 @@ Build a Q&A chatbot step by step using LangChain and OpenAI.
 - API key in `.env` (not committed)
 - Corporate proxy does TLS inspection — `httpx.Client(verify=False)` used in all scripts to bypass SSL verification
 
+## Structure
+```
+LangChain/
+├── learnings.md
+├── handoff.md
+├── 01_chatbot/
+│   └── main.py       ← complete, working
+├── 02_rag/           ← next
+└── 03_agents/
+```
+
 ## Key Files
 - `.env` — OpenAI API key (`OPENAI_API_KEY`)
-- `step2_basic_call.py` — basic LLM call, confirmed working
+- `01_chatbot/main.py` — complete CLI chatbot with memory
 
 ## How to Resume
 1. Activate venv: `venv\Scripts\activate`
