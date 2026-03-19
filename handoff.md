@@ -8,9 +8,10 @@ Build a Q&A chatbot step by step using LangChain and OpenAI.
 ### Completed
 - [x] **Step 1: Setup** — venv created, dependencies installed (`langchain`, `langchain-openai`, `python-dotenv`)
 - [x] **Step 2: Basic LLM call** — `step2_basic_call.py` working
+- [x] **Step 3: Prompt Templates** — `ChatPromptTemplate` added to `step2_basic_call.py`
 
 ### Up Next
-- [ ] **Step 3: Prompt Templates** — give the chatbot a personality, structure inputs with `ChatPromptTemplate`
+- [ ] **Step 4: Memory** — make it remember conversation history with `ChatMessageHistory`
 - [ ] **Step 4: Memory** — make it remember conversation history with `ChatMessageHistory`
 - [ ] **Step 5: CLI chat loop** — interactive terminal chatbot
 
