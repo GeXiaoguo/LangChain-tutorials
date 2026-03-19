@@ -1,7 +1,7 @@
 import httpx
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
-from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 
 load_dotenv()
 
@@ -10,21 +10,28 @@ llm = ChatOpenAI(
     http_client=httpx.Client(verify=False)
 )
 
-# Define the prompt structure
-# SystemMessage sets the chatbot's personality/role
-# HumanMessage is the user's input
-prompt = ChatPromptTemplate.from_messages([
-    ("system", "You are a helpful assistant that answers questions about {topic}. Keep answers concise."),
-    ("human", "{question}"),
-])
+# Memory is just a list of messages — the full conversation history
+history = [
+    SystemMessage(content="You are a helpful assistant that answers questions about space exploration. Keep answers concise.")
+]
 
-# Chain the prompt and the model together using LCEL (|)
-chain = prompt | llm
+# Turn 1
+history.append(HumanMessage(content="What was the first animal in space?"))
+response = llm.invoke(history)
+history.append(AIMessage(content=response.content))  # save the response to history
+print(f"User:      What was the first animal in space?")
+print(f"Assistant: {response.content}\n")
 
-# Invoke the chain with variable values
-response = chain.invoke({
-    "topic": "space exploration",
-    "question": "What was the first animal in space?"
-})
+# Turn 2 — the LLM can refer back to turn 1
+history.append(HumanMessage(content="How long did it survive?"))
+response = llm.invoke(history)
+history.append(AIMessage(content=response.content))
+print(f"User:      How long did it survive?")
+print(f"Assistant: {response.content}\n")
 
-print(response.content)
+# Turn 3
+history.append(HumanMessage(content="What country sent it?"))
+response = llm.invoke(history)
+history.append(AIMessage(content=response.content))
+print(f"User:      What country sent it?")
+print(f"Assistant: {response.content}\n")
