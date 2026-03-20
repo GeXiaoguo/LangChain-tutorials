@@ -1,0 +1,21 @@
+LangChain is a framework for building applications powered by language models.
+It provides tools for chaining together LLM calls, managing prompts, and handling memory.
+
+RAG stands for Retrieval-Augmented Generation. It allows an LLM to answer questions
+about documents it was not trained on, by retrieving relevant chunks at query time
+and injecting them into the prompt as context.
+
+The main steps of RAG are:
+1. Load documents
+2. Split them into chunks
+3. Embed each chunk into a vector
+4. Store vectors in a vector database
+5. At query time, embed the question and find the most similar chunks
+6. Pass those chunks as context to the LLM
+
+LangChain supports many vector stores including Chroma, FAISS, Pinecone, and Weaviate.
+Chroma is the easiest to get started with because it runs in-memory with no setup.
+
+Embeddings are numerical representations of text meaning. Similar text produces
+vectors that are close together in high-dimensional space. OpenAI's
+text-embedding-ada-002 produces 1536-dimensional vectors.

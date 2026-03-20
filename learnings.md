@@ -39,3 +39,88 @@ Each call sends a longer and longer list. "Memory" is entirely client-side.
 They map directly to OpenAI's `{"role": "user/assistant/system", "content": "..."}` format. No logic — just typed wrappers to avoid typos and make provider translation easier.
 
 Most major LLMs (OpenAI, Anthropic, Gemini, Mistral, LLaMA) support the same three roles. This is where LangChain's abstraction genuinely helps — swap one line (`ChatOpenAI` → `ChatAnthropic`) and the rest of the code stays the same.
+
+## RAG: vectors find the chunk, but the LLM sees the original text
+
+The vector store holds two things per chunk: a vector (for similarity search) and the original text + metadata (sent to the LLM). The LLM never sees numbers — it gets the raw text stuffed into the prompt as context.
+
+```
+Vector store entry:
+  vector:   [0.12, -0.87, 0.34, ...]              ← used only for similarity search
+  document: "...became profitable in 2005..."      ← sent to LLM
+  metadata: { source: "history.pdf", page: 3 }    ← optional, useful for citations
+```
+
+## RAG: chunking can break semantic meaning that spans boundaries
+
+A sentence like "...and became profitable in 2005" at the start of a chunk is a fragment without its preceding context. Mitigations:
+
+- **Overlapping chunks** — repeat the last N tokens of the previous chunk at the start of the next
+- **Sentence-aware splitting** — never cut mid-sentence
+- **Parent-child chunking** — index small chunks for precision, retrieve the larger parent for context
+
+## Five ways to give an LLM memory
+
+The LLM itself is always stateless. "Memory" is always something we build around it:
+
+| Approach | How it works | Best for | Limitation |
+|---|---|---|---|
+| **In-context** | Append all messages to history, send every time | Short conversations | Context window limit; cost grows each turn |
+| **RAG** | Embed documents, retrieve relevant chunks at query time | Large static document collections | Retrieval can miss things; stale if docs change |
+| **Fine-tuning** | Train the model on your data, bake knowledge into weights | Stable domain knowledge or style | Expensive, slow, hard to update |
+| **Tool use** | Give the LLM functions it can call (DB query, search API) | Live or dynamic data | Needs tool infrastructure |
+| **External memory** | LLM reads/writes to a dedicated memory store (e.g. MemGPT) | Long-running agents across sessions | Complex to implement |
+
+In real products these are often combined — e.g. RAG for documents + in-context for conversation history + tool use for live data.
+
+## Agentic RAG: the LLM drives its own retrieval
+
+Standard RAG does one retrieval then generates. Agentic RAG lets the LLM decide what to search for, how many times, based on what it finds — like a researcher who looks up one thing and discovers they need to look up something else.
+
+### ReAct loop (Reason + Act)
+
+```
+Question → Thought → Action (search) → Observation → Thought → Action (search again) → ... → Answer
+```
+
+The LLM writes its own reasoning steps and tool calls until it has enough context to answer.
+
+### How tools replace hard-coded retrieval
+
+In standard RAG, retrieval is always called once with the user's question. In an agent, retrieval is a **tool** the LLM can call with its own search query, multiple times, in any order:
+
+```python
+search_tool = create_retriever_tool(retriever, name="search_docs",
+    description="Search docs for facts.")
+# LLM decides when to call it and with what query
+```
+
+### Agentic patterns
+
+| Pattern | How it discovers context |
+|---|---|
+| **ReAct** | Think-act-observe loop; LLM writes its own search queries |
+| **Self-RAG** | LLM critiques retrieved chunks — re-retrieves if not relevant enough |
+| **Multi-hop RAG** | Each chunk reveals new entities to look up next |
+| **LangGraph** | Graph of nodes — each node can retrieve, reason, branch, or loop back |
+
+### When agentic RAG wins over standard RAG
+
+- Questions requiring multiple lookups ("compare X and Y", "how does A relate to B?")
+- Unknown retrieval strategy upfront — the agent figures out what to search
+- Tasks needing tools beyond retrieval (live data, calculation, DB queries)
+
+In LangChain: `create_tool_calling_agent` + `AgentExecutor` is the modern approach. LangGraph is the next level for complex multi-step agents.
+
+## RAG: embedding model options
+
+The embedding model is independent of the generation LLM. Common options:
+
+| Embedding model | Cost | Requires |
+|---|---|---|
+| `OpenAIEmbeddings` | ~$0.0001/1K tokens | OpenAI API key |
+| `HuggingFaceEmbeddings` | Free | Download model locally (~100MB+) |
+| `OllamaEmbeddings` | Free | Ollama running locally |
+| `CohereEmbeddings` | Paid | Cohere API key |
+
+The vector DB is tied to the embedding model, not the generation LLM — you can swap GPT-4 for Claude freely, but changing embedding models requires rebuilding the vector DB. For local/free, `HuggingFaceEmbeddings` with `all-MiniLM-L6-v2` is the most common choice.
