@@ -73,6 +73,19 @@ The LLM itself is always stateless. "Memory" is always something we build around
 
 In real products these are often combined — e.g. RAG for documents + in-context for conversation history + tool use for live data.
 
+## RAG: embedding model options
+
+The embedding model is independent of the generation LLM. Common options:
+
+| Embedding model | Cost | Requires |
+|---|---|---|
+| `OpenAIEmbeddings` | ~$0.0001/1K tokens | OpenAI API key |
+| `HuggingFaceEmbeddings` | Free | Download model locally (~100MB+) |
+| `OllamaEmbeddings` | Free | Ollama running locally |
+| `CohereEmbeddings` | Paid | Cohere API key |
+
+The vector DB is tied to the embedding model, not the generation LLM — you can swap GPT-4 for Claude freely, but changing embedding models requires rebuilding the vector DB. For local/free, `HuggingFaceEmbeddings` with `all-MiniLM-L6-v2` is the most common choice.
+
 ## Agentic RAG: the LLM drives its own retrieval
 
 Standard RAG does one retrieval then generates. Agentic RAG lets the LLM decide what to search for, how many times, based on what it finds — like a researcher who looks up one thing and discovers they need to look up something else.
@@ -111,16 +124,3 @@ search_tool = create_retriever_tool(retriever, name="search_docs",
 - Tasks needing tools beyond retrieval (live data, calculation, DB queries)
 
 In LangChain: `create_tool_calling_agent` + `AgentExecutor` is the modern approach. LangGraph is the next level for complex multi-step agents.
-
-## RAG: embedding model options
-
-The embedding model is independent of the generation LLM. Common options:
-
-| Embedding model | Cost | Requires |
-|---|---|---|
-| `OpenAIEmbeddings` | ~$0.0001/1K tokens | OpenAI API key |
-| `HuggingFaceEmbeddings` | Free | Download model locally (~100MB+) |
-| `OllamaEmbeddings` | Free | Ollama running locally |
-| `CohereEmbeddings` | Paid | Cohere API key |
-
-The vector DB is tied to the embedding model, not the generation LLM — you can swap GPT-4 for Claude freely, but changing embedding models requires rebuilding the vector DB. For local/free, `HuggingFaceEmbeddings` with `all-MiniLM-L6-v2` is the most common choice.
