@@ -1,0 +1,25 @@
+Acme Corp Employee Handbook
+
+## Leave Policy
+Employees are entitled to 20 days of annual leave per year. Leave must be approved by a line manager at least 2 weeks in advance. Unused leave can be carried over up to a maximum of 5 days into the next calendar year.
+
+## Sick Leave
+Employees may take up to 10 days of paid sick leave per year. A medical certificate is required for absences longer than 3 consecutive days. Sick leave does not carry over.
+
+## Remote Work Policy
+Employees may work remotely up to 3 days per week. Remote work must be agreed with the line manager. Employees working remotely are still expected to attend all scheduled meetings.
+
+## Equipment Policy
+Acme Corp provides a laptop and monitor to all full-time employees. Contractors must supply their own equipment. Equipment must be returned on the last day of employment.
+
+## Expense Policy
+Business expenses up to $50 can be reimbursed without prior approval. Expenses above $50 require manager approval before being incurred. All expenses must be submitted within 30 days of being incurred with receipts.
+
+## Performance Reviews
+Performance reviews are held twice a year: in June and December. Employees receive a rating of 1 to 5. A rating of 3 or above is considered meeting expectations. Employees with a rating of 2 or below for two consecutive reviews may be placed on a performance improvement plan.
+
+## Salary and Bonuses
+Salaries are reviewed annually in January. Bonuses are paid in February based on the December performance review rating. Employees with a rating of 4 receive a 5% bonus. Employees with a rating of 5 receive a 10% bonus.
+
+## Termination Policy
+Employees must give 4 weeks notice before resigning. The company may terminate employment with 4 weeks notice except in cases of gross misconduct, where termination may be immediate. Final pay including unused leave is processed within 7 days of the last working day.
