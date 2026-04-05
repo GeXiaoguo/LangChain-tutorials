@@ -21,7 +21,7 @@ Build LangChain concepts step by step: chatbot → RAG → agentic RAG → LangG
 
 ### Up Next (Advanced)
 - [ ] **10_long_term_memory** — Store API: semantic memory across threads
-- [ ] **11_tool_nodes** — ToolNode prebuilt: cleaner tool-calling wiring
+- [x] **09_tool_nodes** — ToolNode prebuilt + tools_condition routing; @tool decorator; parallel tool calls
 - [ ] **12_map_reduce** — Fan-out/fan-in: run a node in parallel over a list
 
 ## Environment Notes
@@ -66,7 +66,7 @@ LangChain/
 
 ## How to Resume
 1. Activate venv: `venv\Scripts\activate`
-2. `08_multi_agent` is complete — start `09_subgraphs` next
+2. `09_tool_nodes` is complete — start `09_subgraphs` or `10_long_term_memory` next
 3. Good test question (works for 03_agent and 04_langgraph): *"If I get a rating of 4 and resign, what happens to my bonus and unused leave?"*
 
 ## Concepts Covered
@@ -81,6 +81,9 @@ LangChain/
 - LangGraph persistence: SqliteSaver, add_messages reducer, thread_id isolation, get_state() inspection (05_persistence)
 - LangGraph design critique: thread_id is chatbot-biased naming; configurable dict shape is convention not types; compile() injects hidden behavior
 - Human-in-the-loop: interrupt() pauses mid-node, Command(resume=...) resumes with human decision; MemorySaver vs SqliteSaver tradeoff (06_human_in_loop)
+- Streaming: stream() per-node, stream_mode="messages" per-token, stream_mode="updates" delta (07_streaming)
+- Multi-agent supervisor: Command(goto=...) routing, shared messages as agent communication channel (08_multi_agent)
+- ToolNode + tools_condition: prebuilt tool execution, @tool decorator, parallel tool calls, bind_tools() (09_tool_nodes)
 
 ## What's Next — 09_subgraphs
 
