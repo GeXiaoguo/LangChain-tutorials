@@ -63,18 +63,47 @@ A prebuilt routing function:
 
 Replaces the manual `grade_and_route` pattern from earlier examples.
 
-## How Tools Are Defined
+## How Tools Are Defined — Two Patterns
+
+### Pattern A: docstring as LLM description (conventional)
 
 ```python
 @tool
 def calculate(expression: str) -> str:
-    """Evaluate a mathematical expression."""  # <- LLM reads this docstring
+    """Evaluate a mathematical expression. Examples: '2 + 2', '10 * 3.5'."""
     return str(eval(expression))
 ```
 
-The `@tool` decorator turns a plain function into a LangChain tool. The
-docstring becomes the description the LLM uses to decide when to call it.
-The type annotations become the argument schema.
+`@tool` reads `fn.__doc__` at decoration time and uses it as the tool
+description sent to the LLM.
+
+**Problem:** the docstring serves two audiences — developers reading the code,
+and the LLM deciding when to call the tool. Their needs differ. A developer
+tidying up the docstring can silently break tool selection. Nothing in the
+code signals that this string is load-bearing.
+
+### Pattern B: explicit `description=` (preferred)
+
+```python
+@tool(description="Get the current weather for a city. Examples: 'London', 'Tokyo'.")
+def get_weather(city: str) -> str:
+    """Internal mock tool. Replace with a real API call in production."""
+    ...
+```
+
+The LLM description and the developer docstring are separate. Intent is
+explicit — it's clear which string the LLM sees and which is for developers.
+
+**When to use which:**
+
+| | Pattern A (docstring) | Pattern B (explicit) |
+|---|---|---|
+| Explicitness | Implicit — coupling is hidden | Explicit — LLM description is visible |
+| Separation of concerns | None — one string for two audiences | Clean — dev doc and LLM prompt independent |
+| Verbosity | Less | Slightly more |
+| Convention | Most LangChain examples use this | Underadvertised but available |
+
+Pattern B is the better design for anything beyond quick prototypes.
 
 ## Binding Tools to the LLM
 

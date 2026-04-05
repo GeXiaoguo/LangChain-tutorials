@@ -26,10 +26,20 @@ http_client = httpx.Client(verify=False)
 http_async_client = httpx.AsyncClient(verify=False)
 
 # ---------------------------------------------------------------------------
-# Tools — plain Python functions decorated with @tool.
-# The docstring becomes the tool description the LLM uses to decide when
-# and how to call it.
+# Tools — two ways to provide the LLM description:
+#
+# Pattern A (conventional): docstring as description.
+#   The @tool decorator reads fn.__doc__ at decoration time.
+#   Downside: the docstring serves two audiences (devs and the LLM) and
+#   the coupling is implicit — a developer tidying the docstring can
+#   accidentally break tool selection.
+#
+# Pattern B (explicit): description= keyword argument.
+#   The LLM description is separate from the developer docstring.
+#   More verbose but clearer about intent.
 # ---------------------------------------------------------------------------
+
+# Pattern A — docstring is the LLM description
 @tool
 def calculate(expression: str) -> str:
     """Evaluate a mathematical expression. Examples: '2 + 2', '10 * 3.5', '100 / 4'."""
@@ -39,9 +49,10 @@ def calculate(expression: str) -> str:
     except Exception as e:
         return f"Error: {e}"
 
-@tool
+# Pattern B — explicit description separate from developer docstring
+@tool(description="Get the current weather for a city. Examples: 'London', 'Tokyo', 'Sydney'.")
 def get_weather(city: str) -> str:
-    """Get the current weather for a city."""
+    """Internal mock weather tool. Returns hardcoded data — replace with a real API call."""
     # Mocked — in a real app this would call a weather API
     weather_data = {
         "london": "12C, overcast",
