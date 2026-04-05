@@ -124,3 +124,51 @@ search_tool = create_retriever_tool(retriever, name="search_docs",
 - Tasks needing tools beyond retrieval (live data, calculation, DB queries)
 
 In LangChain: `create_tool_calling_agent` + `AgentExecutor` is the modern approach. LangGraph is the next level for complex multi-step agents.
+
+## LangGraph: graph structure, state, and persistence
+
+### Graph definition is separate from execution
+
+A graph is built from nodes (functions) and edges (wiring). `compile()` is the separate step that makes it executable — and is where cross-cutting behavior like checkpointing is injected. The same graph can be compiled different ways:
+
+```python
+app_dev  = graph.compile(checkpointer=MemorySaver())   # tests
+app_prod = graph.compile(checkpointer=PostgresSaver())  # production
+app_bare = graph.compile()                              # no persistence
+```
+
+### State reducers — the same concept as React/Redux
+
+Each field in `State` can declare a **reducer** via `Annotated[type, reducer_fn]`:
+
+```python
+class State(TypedDict):
+    messages: Annotated[list, add_messages]
+```
+
+The reducer controls how updates are merged into existing state. Default is replace; `add_messages` appends. The node just returns what's new — the reducer handles the merge. This is the same concept as a Redux reducer, just declared on the type rather than called explicitly.
+
+### Conditional routing returns a string, not a boolean
+
+A routing function returns the name of the next node to run. This is what makes multi-branch routing possible:
+
+```python
+def grade_and_route(state) -> str:
+    return "generate" if sufficient else "retrieve"
+```
+
+### Checkpointing: `compile()` injects hidden load/save around every node
+
+`compile(checkpointer=...)` wraps every node execution with load/save logic. Your node code stays clean — the checkpointer is wired in at compile time, not in the node itself.
+
+The checkpointer is an **object** (not a function) because it needs to hold a DB connection and expose multiple operations: `get`, `put`, `list`.
+
+### `thread_id` scopes state — but the name is chatbot-biased
+
+`thread_id` is LangGraph's reserved key inside `config["configurable"]` for identifying which state to load/save. Same ID resumes; different ID starts fresh. It maps to whatever a "unit of work" means in your domain — conversation, document, order, game session.
+
+The naming is a historical artefact — LangGraph grew out of LangChain's chatbot origins. The mechanism is general-purpose but the names (thread, messages) reflect the original use case. Classic tech debt: the abstraction outgrew its metaphor.
+
+### The `{"configurable": {"thread_id": "..."}}` shape is a hardcoded convention
+
+LangGraph literally does `config["configurable"]["thread_id"]` internally. The nesting exists so user-defined runtime config doesn't collide with LangGraph's own keys. Typos fail silently — nothing in the type system enforces the key name.
