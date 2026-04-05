@@ -3,3 +3,4 @@ venv/
 __pycache__/
 *.pyc
 rootcert.pem
+memory.db

@@ -11,9 +11,10 @@ Build LangChain concepts step by step: chatbot → RAG → agentic RAG → LangG
 - [x] **03_agent** — Agentic RAG: LLM uses a retriever as a tool, calls it multiple times via ReAct loop
 
 - [x] **04_langgraph** — Explicit state graphs: nodes, edges, conditional routing, corrective RAG loop
+- [x] **05_persistence** — LangGraph checkpointers: SqliteSaver, add_messages reducer, thread isolation
 
 ### Up Next
-- [ ] **05_persistence** — LangGraph checkpointers: save and resume graph state across sessions; thread-based memory
+- [ ] **06_human_in_loop** — interrupt_before/after: pause graph execution for human review/approval before continuing
 
 ## Environment Notes
 - Python venv at `venv/` (not committed)
@@ -40,7 +41,10 @@ LangChain/
 ├── 04_langgraph/
 │   ├── main.py                   ← complete, working — corrective RAG with grade_and_route loop
 │   └── sample.txt
-└── 05_persistence/               ← next
+├── 05_persistence/
+│   ├── main.py                   ← complete, working — SqliteSaver + thread isolation demo
+│   └── memory.db                 ← SQLite checkpoint file (git-ignored)
+└── 06_human_in_loop/             ← next
 ```
 
 ## Key Files
@@ -52,7 +56,7 @@ LangChain/
 
 ## How to Resume
 1. Activate venv: `venv\Scripts\activate`
-2. `04_langgraph` is complete — start `05_persistence` next
+2. `05_persistence` is complete — start `06_human_in_loop` next
 3. Good test question (works for 03_agent and 04_langgraph): *"If I get a rating of 4 and resign, what happens to my bonus and unused leave?"*
 
 ## Concepts Covered
@@ -64,16 +68,15 @@ LangChain/
 - RAG limitations for non-text content: images, diagrams, Mermaid, code (rag_limitations_non_text.md)
 - How Claude Code works — no RAG, pure tool-based navigation; CLAUDE.md as human-curated index
 - Explicit LangGraph: State, nodes, edges, conditional routing, corrective RAG retry loop (04_langgraph)
+- LangGraph persistence: SqliteSaver, add_messages reducer, thread_id isolation, get_state() inspection (05_persistence)
 
-## What's Next — 05_persistence
+## What's Next — 06_human_in_loop
 
-LangGraph can save graph state via **checkpointers** so that:
-- A graph run can be **paused and resumed** across sessions or process restarts
-- Each conversation thread gets its own isolated state (thread-based memory)
-- You can replay or inspect past runs
+With checkpointers in place, LangGraph can **pause mid-graph** and wait for a
+human to approve or modify state before continuing.
 
 Key concepts to cover:
-- `MemorySaver` — in-process checkpointer (dev/testing)
-- `SqliteSaver` / `PostgresSaver` — persistent checkpointers
-- `config = {"configurable": {"thread_id": "..."}}` — how threads are identified
-- How checkpointing enables human-in-the-loop (pause before a sensitive step, wait for approval)
+- `interrupt_before=["node_name"]` — pause before a sensitive node runs
+- `app.update_state(config, {...})` — inject human input into the checkpoint
+- `app.invoke(None, config)` — resume from where it was interrupted
+- Use case: agent wants to send an email / delete data — human must approve first
