@@ -53,7 +53,7 @@ retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
 # State — this is what flows between nodes. Unlike create_agent which only
 # has "messages", we define exactly what fields we need.
 # ---------------------------------------------------------------------------
-class RAGState(TypedDict):
+class State(TypedDict):
     question: str
     context: list[str]   # chunks retrieved so far
     answer: str
@@ -62,7 +62,7 @@ class RAGState(TypedDict):
 # ---------------------------------------------------------------------------
 # Nodes — each is a plain function: State -> partial State update
 # ---------------------------------------------------------------------------
-def retrieve(state: RAGState) -> dict:
+def retrieve(state: State) -> dict:
     print(f"\n[retrieve] Attempt {state['search_attempts'] + 1}")
     docs = retriever.invoke(state["question"])
     context = [doc.page_content for doc in docs]
@@ -72,7 +72,7 @@ def retrieve(state: RAGState) -> dict:
         "search_attempts": state["search_attempts"] + 1,
     }
 
-def generate(state: RAGState) -> dict:
+def generate(state: State) -> dict:
     print(f"\n[generate] Building answer from {len(state['context'])} chunks")
     context_text = "\n\n".join(state["context"])
     response = llm.invoke([
@@ -85,7 +85,7 @@ def generate(state: RAGState) -> dict:
 # Conditional edge — this is the routing logic create_agent hides from you.
 # Returns the name of the next node to run.
 # ---------------------------------------------------------------------------
-def grade_and_route(state: RAGState) -> str:
+def grade_and_route(state: State) -> str:
     print(f"\n[grade] Evaluating context sufficiency...")
     context_text = "\n\n".join(state["context"])
     response = llm.invoke([
@@ -112,7 +112,7 @@ def grade_and_route(state: RAGState) -> str:
 #                         │
 #                         └──── retrieve (loop back if not sufficient)
 # ---------------------------------------------------------------------------
-graph = StateGraph(RAGState)
+graph = StateGraph(State)
 
 graph.add_node("retrieve", retrieve)
 graph.add_node("generate", generate)
