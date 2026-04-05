@@ -13,8 +13,16 @@ Build LangChain concepts step by step: chatbot → RAG → agentic RAG → LangG
 - [x] **04_langgraph** — Explicit state graphs: nodes, edges, conditional routing, corrective RAG loop
 - [x] **05_persistence** — LangGraph checkpointers: SqliteSaver, add_messages reducer, thread isolation
 
-### Up Next
+### Up Next (Core)
 - [x] **06_human_in_loop** — interrupt()/Command(resume=...): pause mid-node for human review, resume with decision
+- [x] **07_streaming** — stream(), stream_mode="messages" (tokens), stream_mode="updates" (delta)
+- [ ] **08_multi_agent** — Supervisor + specialist agents; how agents delegate to each other
+- [ ] **09_subgraphs** — Graphs nested inside graphs; composing complex workflows
+
+### Up Next (Advanced)
+- [ ] **10_long_term_memory** — Store API: semantic memory across threads
+- [ ] **11_tool_nodes** — ToolNode prebuilt: cleaner tool-calling wiring
+- [ ] **12_map_reduce** — Fan-out/fan-in: run a node in parallel over a list
 
 ## Environment Notes
 - Python venv at `venv/` (not committed)
@@ -58,7 +66,7 @@ LangChain/
 
 ## How to Resume
 1. Activate venv: `venv\Scripts\activate`
-2. `06_human_in_loop` is complete — start `07_multi_agent` next
+2. `07_streaming` is complete — start `08_multi_agent` next
 3. Good test question (works for 03_agent and 04_langgraph): *"If I get a rating of 4 and resign, what happens to my bonus and unused leave?"*
 
 ## Concepts Covered
@@ -74,10 +82,10 @@ LangChain/
 - LangGraph design critique: thread_id is chatbot-biased naming; configurable dict shape is convention not types; compile() injects hidden behavior
 - Human-in-the-loop: interrupt() pauses mid-node, Command(resume=...) resumes with human decision; MemorySaver vs SqliteSaver tradeoff (06_human_in_loop)
 
-## What's Next — 07_multi_agent
+## What's Next — 08_multi_agent
 
-Multiple specialized agents working together — one agent delegates subtasks to others:
-- Supervisor agent — routes tasks to specialist agents
-- Specialist agents — each owns a domain (research, writing, code)
+Multiple specialized agents working together:
+- Supervisor agent — routes tasks to specialist agents based on LLM decision
+- Specialist agents — each owns a domain (e.g. research, writing)
 - How agents communicate via shared state or message passing
-- Use case: a research + writing pipeline where one agent searches, another drafts
+- Use case: a pipeline where one agent searches, another drafts a response
