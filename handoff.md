@@ -14,7 +14,7 @@ Build LangChain concepts step by step: chatbot → RAG → agentic RAG → LangG
 - [x] **05_persistence** — LangGraph checkpointers: SqliteSaver, add_messages reducer, thread isolation
 
 ### Up Next
-- [ ] **06_human_in_loop** — interrupt_before/after: pause graph execution for human review/approval before continuing
+- [x] **06_human_in_loop** — interrupt()/Command(resume=...): pause mid-node for human review, resume with decision
 
 ## Environment Notes
 - Python venv at `venv/` (not committed)
@@ -44,7 +44,9 @@ LangChain/
 ├── 05_persistence/
 │   ├── main.py                   ← complete, working — SqliteSaver + thread isolation demo
 │   └── memory.db                 ← SQLite checkpoint file (git-ignored)
-└── 06_human_in_loop/             ← next
+├── 06_human_in_loop/
+│   └── main.py                   ← complete, working — email draft with approve/reject pause
+└── 07_multi_agent/               ← next
 ```
 
 ## Key Files
@@ -56,7 +58,7 @@ LangChain/
 
 ## How to Resume
 1. Activate venv: `venv\Scripts\activate`
-2. `05_persistence` is complete — start `06_human_in_loop` next
+2. `06_human_in_loop` is complete — start `07_multi_agent` next
 3. Good test question (works for 03_agent and 04_langgraph): *"If I get a rating of 4 and resign, what happens to my bonus and unused leave?"*
 
 ## Concepts Covered
@@ -70,14 +72,12 @@ LangChain/
 - Explicit LangGraph: State, nodes, edges, conditional routing, corrective RAG retry loop (04_langgraph)
 - LangGraph persistence: SqliteSaver, add_messages reducer, thread_id isolation, get_state() inspection (05_persistence)
 - LangGraph design critique: thread_id is chatbot-biased naming; configurable dict shape is convention not types; compile() injects hidden behavior
+- Human-in-the-loop: interrupt() pauses mid-node, Command(resume=...) resumes with human decision; MemorySaver vs SqliteSaver tradeoff (06_human_in_loop)
 
-## What's Next — 06_human_in_loop
+## What's Next — 07_multi_agent
 
-With checkpointers in place, LangGraph can **pause mid-graph** and wait for a
-human to approve or modify state before continuing.
-
-Key concepts to cover:
-- `interrupt_before=["node_name"]` — pause before a sensitive node runs
-- `app.update_state(config, {...})` — inject human input into the checkpoint
-- `app.invoke(None, config)` — resume from where it was interrupted
-- Use case: agent wants to send an email / delete data — human must approve first
+Multiple specialized agents working together — one agent delegates subtasks to others:
+- Supervisor agent — routes tasks to specialist agents
+- Specialist agents — each owns a domain (research, writing, code)
+- How agents communicate via shared state or message passing
+- Use case: a research + writing pipeline where one agent searches, another drafts
