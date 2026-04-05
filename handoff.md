@@ -69,6 +69,7 @@ LangChain/
 - How Claude Code works — no RAG, pure tool-based navigation; CLAUDE.md as human-curated index
 - Explicit LangGraph: State, nodes, edges, conditional routing, corrective RAG retry loop (04_langgraph)
 - LangGraph persistence: SqliteSaver, add_messages reducer, thread_id isolation, get_state() inspection (05_persistence)
+- LangGraph design critique: thread_id is chatbot-biased naming; configurable dict shape is convention not types; compile() injects hidden behavior
 
 ## What's Next — 06_human_in_loop
 
